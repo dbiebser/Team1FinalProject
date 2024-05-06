@@ -1,38 +1,93 @@
 import React from 'react';
-import Select from 'react-select';
-import AsyncSelect from 'react-select/async';
-import makeAnimated from 'react-select/animated';
 
 const SearchDropdown = () => {
-    const [selectedOption, setSelectedOption] = useState(null);
-    const handleChange = (option) => {
-        setSelectedOption(option);
-        console.log(`Option selected:`, option);
-    }
-    const loadOptions = (inputValue) => {
-        return fetch(/*link for mongo*/)
-            .then(response => response.json())
-            .then(data => data.map(user => ({ /*get title of show*/})))
-    }
-    const [inputValue, setInputValue] = useState('');
-    const handleInputChange = (newValue) => {
-        const inputValue = newValue.replace(/\\\\W/g, '');
-        setInputValue(inputValue);
-        return inputValue;
-    }
+    const [data, setData] = useState([]);
+
+  const fetchData = () => {
+
+    return fetch("https://jsonplaceholder.typicode.com/users")
+
+      .then((res) => res.json())
+
+      .then((d) => setData(d));
+
+  };
+
+  useEffect(() => {
+
+    fetchData();
+
+  }, []);
+
+  const [query, setQuery] = useState("");
+
+  const search_parameters = Object.keys(Object.assign({}, ...data));
+
+  function search(data) {
+
+    return data.filter((data) =>
+
+      search_parameters.some((parameter) =>
+
+        data[parameter].toString().toLowerCase().includes(query)
+
+      )
+
+    );
+
+  }
 
     return (
-        <div>
-            <AsyncSelect 
-                cacheOptions
-                loadOption={loadOptions}
-                defaultOptions
-                onInputChange={handleInputChange}
-            />
-        </div>
+        <div className="container">
+
+      <center>
+
+        <h1>Search component</h1>
+
+      </center>
+
+      <div className="input-box">
+
+        <input
+
+          type="search"
+
+          name="search-form"
+
+          id="search-form"
+
+          className="search-input"
+
+          onChange={(e) => setQuery(e.target.value)}
+
+          placeholder="Search user"
+
+        />
+
+      </div>
+
+      <center>
+
+        {search(data).map((dataObj) => {
+
+          return (
+
+            <div className="box">
+
+              <div class="card">
+
+                <div class="category">@{dataObj.title} </div>
+
+              </div>
+
+            </div>
+
+          );
+
+        })}
+
+      </center>
+
+    </div>
     )
 }
-
-// .search-dropdown {
-//     min-width="300px";
-// }
